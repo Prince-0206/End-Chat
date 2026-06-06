@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
 import { url } from './credits'
+import { Answer } from './Components/Answer'
 
 const App = () => {
   const [question, setquestion] = useState('')
-  const [answer, setanswer] = useState('')
+  const [answer, setanswer] = useState()
 
   const handleKeyDown = (event) => {
     if (event.key === 'Enter') {
@@ -32,7 +33,14 @@ const App = () => {
       body: JSON.stringify(paylaod)
     })
     response = await response.json();
-    setanswer(response.candidates[0].content.parts[0].text)
+    let result = response.candidates[0].content.parts[0].text
+    result = result.split("*  ")
+    result = result.map((item)=>
+      item.trim()
+    )
+    console.log(result);
+    
+    setanswer(result)
   }
   return (
     <div className='grid grid-cols-5 h-screen text-center' style={{ background: '#07051a' }}>
@@ -46,9 +54,13 @@ const App = () => {
       <div className='col-span-4 p-10 flex flex-col gap-6' style={{ background: '#0d0b24' }}>
 
         <div className='flex-1 rounded-2xl border text-white border-indigo-900' style={{ background: '#0f0c29' }}>
-         {answer} 
+          {answer && answer.map((item, idx) => (
+  <li key={idx} className="list-none">
+    <Answer ans={item} />
+  </li>
+))}
         </div>
-
+          
         <div
           className='pr-1 w-1/2 m-auto rounded-full border border-indigo-800 flex h-16 p-1 items-center'
           style={{ background: '#1e1b4b' }}
