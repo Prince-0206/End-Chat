@@ -15,6 +15,7 @@ const App = () => {
 
   
   const askquestion = async()=>{
+    setquestion("  ")
     const paylaod = {
    
     "contents": [
@@ -37,8 +38,7 @@ const App = () => {
     result = result.split("*  ")
     result = result.map((item)=>
       item.trim()
-    )
-    console.log(result);
+  )
     
     setanswer(result)
   }
@@ -51,14 +51,15 @@ const App = () => {
         </h1>
       </div>
 
-      <div className='col-span-4 p-10 flex flex-col gap-6' style={{ background: '#0d0b24' }}>
+      <div className='col-span-4 overflow-scroll p-10 flex flex-col gap-6' style={{ background: '#0d0b24' }}>
 
-        <div className='flex-1 rounded-2xl border text-white border-indigo-900' style={{ background: '#0f0c29' }}>
+        <div className='flex-1 rounded-2xl border text-white border-indigo-900 overflow-y-auto' style={{ background: '#0f0c29' }}>
+          <ul>
           {answer && answer.map((item, idx) => (
-  <li key={idx} className="list-none">
-    <Answer ans={item} />
+  <li key={idx} className="text-indigo-100 text-sm leading-relaxed px-6 py-2 text-left">
+    <Answer ans={item} idx={idx} totalresult={answer.length} />
   </li>
-))}
+))}</ul>
         </div>
           
         <div
