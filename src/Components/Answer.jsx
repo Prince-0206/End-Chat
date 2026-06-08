@@ -1,68 +1,52 @@
-import React from 'react'
+import { useEffect, useState } from "react";
+import { checkHeading, replaceHeadingStarts } from "../helper";
+import SyntaxHighlighter from 'react-syntax-highlighter/dist/esm/default-highlight'
+import atomOneDark from 'react-syntax-highlighter/dist/esm/styles/hljs/atom-one-dark'
+import ReactMarkdown from 'react-markdown'
 
-export const Answer = ({ ans, idx, totalresult }) => {
+const Answer = ({ ans, totalResult, index, type }) => {
+  const [heading, setHeading] = useState(false);
+  const [answer, setAnswer] = useState(ans);
 
-  const boldify = (str) =>
-    str.replace(/\*\*(.*?)\*\*/g, '<span style="color:#c4b5fd;font-weight:500;">$1</span>')
+  useEffect(() => {
+    if (checkHeading(ans)) {
+      setHeading(true);
+      setAnswer(replaceHeadingStarts(ans))
+    }
+  }, [])
 
-  // First line = title
-  if (idx === 0 && totalresult.length > 1) {
-    return <p className='text-2xl font-bold text-indigo-100 pb-3 border-b border-indigo-900 mb-2'>
-      {ans.replace(/\*\*/g, '')}
-    </p>
+  const components = {
+    code({ node, inline, className, children, ...props }) {
+      const match = /language-(\w+)/.exec(className || '');
+      return !inline && match ? (
+        <SyntaxHighlighter
+          {...props}
+          style={atomOneDark}  // ✅ atomOneDark use karo
+          language={match[1]}
+          PreTag="div"
+        >
+          {String(children).replace(/\n$/, '')}
+        </SyntaxHighlighter>
+      ) : (
+        <code className="bg-[#0a0820] text-violet-300 text-xs px-1.5 py-0.5 rounded font-mono" {...props}>
+          {children}
+        </code>
+      );
+    }
   }
 
-  // Divider
-  if (ans === '---') {
-    return <hr className='border-indigo-900 my-4' />
-  }
-
-  // #### Sub heading
-  if (ans.startsWith('#### ')) {
-    return <p className='text-sm font-semibold text-indigo-300 mt-3 mb-1'>{ans.slice(5)}</p>
-  }
-
-  // ### Section heading
-  if (ans.startsWith('### ')) {
-    return <p className='text-base font-semibold text-cyan-400 mt-5 mb-1'>{ans.slice(4)}</p>
-  }
-
-  // ## or # Heading
-  if (ans.startsWith('## ') || ans.startsWith('# ')) {
-    return <p className='text-lg font-bold text-indigo-100 mt-5 mb-2'>{ans.replace(/^#{1,2}\s/, '')}</p>
-  }
-
-  // **bold line** = subheading
-  if (ans.startsWith('**') && ans.endsWith('**')) {
-    return <p className='text-sm font-semibold text-violet-400 mt-3 mb-1'>{ans.slice(2, -2)}</p>
-  }
-
-  // Bullet point
-  if (ans.startsWith('* ') || ans.startsWith('- ') || ans.startsWith('• ')) {
-    return (
-      <p className='text-indigo-200 text-sm leading-relaxed flex gap-2 pl-2 mb-1'>
-        <span className='text-violet-400 flex-shrink-0'>•</span>
-        <span dangerouslySetInnerHTML={{ __html: boldify(ans.slice(2)) }} />
-      </p>
-    )
-  }
-
-  // Numbered list
-  if (/^\d+\.\s/.test(ans)) {
-    const num = ans.match(/^\d+/)[0]
-    const text = ans.replace(/^\d+\.\s/, '')
-    return (
-      <p className='text-indigo-200 text-sm leading-relaxed flex gap-2 pl-2 mb-1'>
-        <span className='text-violet-400 flex-shrink-0 font-medium'>{num}.</span>
-        <span dangerouslySetInnerHTML={{ __html: boldify(text) }} />
-      </p>
-    )
-  }
-
-  // Normal text
   return (
-    <p className='text-indigo-200 text-sm leading-relaxed mb-1'
-      dangerouslySetInnerHTML={{ __html: boldify(ans) }}
-    />
+    <>
+      {index == 0 && totalResult > 1
+        ? <span className="pt-2 text-xl block text-white">{answer}</span>
+        : heading
+        ? <span className="pt-2 text-lg block text-white">{answer}</span>
+        : <span className={type == 'q' ? 'pl-1' : 'pl-5'}>
+            <ReactMarkdown components={components}>{answer}</ReactMarkdown>
+          </span>
+      }
+    </>
   )
 }
+
+export default Answer
