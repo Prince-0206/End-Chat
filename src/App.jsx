@@ -35,12 +35,10 @@ const App = () => {
     })
     response = await response.json();
     let result = response.candidates[0].content.parts[0].text
-    result = result.split("*  ")
-    result = result.map((item)=>
-      item.trim()
-  )
-    
-    setanswer(result)
+result = result.split("\n")
+result = result.map((item) => item.trim())
+result = result.filter((item) => item !== "" && item !== "•")  // ✅ lone "•" remove karo
+setanswer(result)
   }
   return (
     <div className='grid grid-cols-5 h-screen text-center' style={{ background: '#07051a' }}>
