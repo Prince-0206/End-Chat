@@ -55,7 +55,7 @@ setanswer(result)
           <ul>
           {answer && answer.map((item, idx) => (
   <li key={idx} className="text-indigo-100 text-sm leading-relaxed px-6 py-2 text-left">
-    <Answer ans={item} idx={idx} totalresult={answer.length} />
+    <Answer ans={item} idx={idx+Math.random()} totalresult={answer.length} />
   </li>
 ))}</ul>
         </div>
